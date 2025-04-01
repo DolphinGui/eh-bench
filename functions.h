@@ -5,29 +5,31 @@ struct ResultType {
   int result;
 };
 
-// literally does nothing, exists to inhibit compiler optimization;
-void clobber(int *, int *, int *, int *, int *, int *, int *);
-
 // As the name suggests, does literally no error
 // handling.
-int no_error(int, int, int, int, int, int, int, int);
+int final_noerror(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5, int = 6,
+                  int = 7);
 
 // result_error represents ML style error handling, where errors
 // are just types. This requires checking the return value
 // every single time.
-ResultType result_error(int, int, int, int, int, int, int, int);
+ResultType final_result(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5,
+                        int = 6, int = 7);
 
 struct ExceptionBase {};
 
 struct ExceptionA : ExceptionBase {
+  ExceptionA(int t) : type(t) {}
   int type;
 };
 
 struct ExceptionB : ExceptionBase {
+  ExceptionB(int m) : message(m) {}
   int message;
 };
 
 struct ExceptionC : ExceptionBase {
+  ExceptionC(int s) : stuff(s) {}
   int stuff;
 };
 
@@ -39,4 +41,9 @@ struct ExceptionC : ExceptionBase {
 // In order to avoid the string allocation
 // in std::exception, we define our own
 // exception type which contains barely any
-int exception_error(int, int, int, int, int, int, int, int);
+
+int final_exception(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5,
+                    int = 6, int = 7);
+
+int final_exception_success(int = 0, int = 0, int = 0, int = 0, int = 0,
+                            int = 0, int = 0, int = 0);
