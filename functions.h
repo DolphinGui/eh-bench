@@ -7,14 +7,14 @@ struct ResultType {
 
 // As the name suggests, does literally no error
 // handling.
-int final_noerror(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5, int = 6,
-                  int = 7);
+int final_noerror(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
+                  int = 0);
 
 // result_error represents ML style error handling, where errors
 // are just types. This requires checking the return value
 // every single time.
-ResultType final_result(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5,
-                        int = 6, int = 7);
+ResultType final_result(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
+                        int = 0, int = 0);
 
 struct ExceptionBase {};
 
@@ -42,8 +42,5 @@ struct ExceptionC : ExceptionBase {
 // in std::exception, we define our own
 // exception type which contains barely any
 
-int final_exception(int = 0, int = 1, int = 2, int = 3, int = 4, int = 5,
-                    int = 6, int = 7);
-
-int final_exception_success(int = 0, int = 0, int = 0, int = 0, int = 0,
-                            int = 0, int = 0, int = 0);
+int final_exception(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
+                    int = 0, int = 0);

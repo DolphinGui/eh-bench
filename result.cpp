@@ -8,7 +8,7 @@ ResultType final_result(int a, int b, int c, int d, int e, int f, int g,
   asm volatile(""
                : "+m"(a), "+m"(b), "+m"(c), "+m"(d), "+m"(e), "+m"(f), "+m"(g),
                  "+m"(h), "=m"(stack)::"memory");
-  if (a + b + c + d + e + f + g + h) {
+  if (!(a + b + c + d + e + f + g + h)) {
     r.is_some = 0;
     r.result = -1;
   } else {
