@@ -18,11 +18,12 @@ main = open(sys.argv[3], "w")
 
 main.write("""
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define ANKERL_NANOBENCH_IMPLEMENT
 
-#include "functions.h"
-#include "branches.h"
 #include <doctest.h>
 #include <nanobench.h>
+#include "functions.h"
+#include "branches.h"
 
 """)
 
@@ -69,10 +70,10 @@ def generate(depth, template, name, rettype):
     else:
       argnum = random.randint(1, 6)
     arrsize = random.randint(0, 24)
-    clobber = ["\"+m\"({})".format(r) for r in argument_names[0:argnum]]
+    clobber = argument_names[0:argnum]
     if arrsize > 0:
       arr = "char stack[{}]".format(arrsize)
-      clobber.append("\"+m\"(stack)")
+      clobber.append("stack")
     else:
       arr = ""
     clobber = ", ".join(clobber) 
@@ -87,22 +88,22 @@ def generate(depth, template, name, rettype):
 
     args = ", ".join(arguments[0:argnum])
 
-    cpp.write(template.format(name=name, depth=depth, num = i, args = args, stack = arr, asm = clobber, ret = ret))
+    cpp.write(template.format(name=name, depth=depth, num = i, args = args, stack = arr, clobbered = clobber, ret = ret))
 
-noerror = """[[gnu::noinline]]int \n{name}_d{depth}_{num}({args}){{
+noerror = """NOINLINE\nint \n{name}_d{depth}_{num}({args}){{
   {stack};
-  asm volatile("" : {asm} :: "memory");
+  clobber({clobbered});
   return {ret};
 }}\n\n"""
 
-result_type = """[[gnu::noinline]]ResultType \n{name}_d{depth}_{num}({args}){{
+result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
   {stack};
-  asm volatile("" : {asm} :: "memory");
+  clobber({clobbered});
   auto r = {ret};
   if(!r.is_some){{
     return r;
   }}
-  asm volatile("" : "+m"(r) :: "memory");
+  clobber(r);
   return r;
 }}\n\n"""
 

@@ -1,5 +1,25 @@
 #pragma once
 
+#include "nanobench.h"
+
+#ifdef _MSC_VER
+#define NOINLINE [[msvc::noinline]]
+#define FORCEINLINE [[msvc::flatten]]
+#else
+#define NOINLINE [[gnu::noinline]]
+#define FORCEINLINE [[gnu::always_inline]]
+#endif
+
+
+template <typename T> FORCEINLINE void clobber(T &&a) {
+  ankerl::nanobench::doNotOptimizeAway(a);
+}
+
+template <typename T, typename... Ts> FORCEINLINE void clobber(T &&t, Ts &&...ts) {
+  clobber(t);
+  clobber(ts...);
+}
+
 struct ResultType {
   bool is_some;
   int result;

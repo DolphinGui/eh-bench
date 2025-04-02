@@ -15,7 +15,6 @@ test_data = custom_target(
 
 exe = executable(
     'eh-bench',
-    'nanobench.cpp',
     'no_error.cpp',
     'result.cpp',
     'exception.cpp',
