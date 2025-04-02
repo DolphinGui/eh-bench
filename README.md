@@ -33,9 +33,9 @@ project as single-file headers.
 
 Functions are generated with varying amounts of parameters ranging from 1
 parameter to 6 parameters. A varying amount of stack is allocated in the form of
-an array from 0 to 24 bytes. Everything is forced to be spilled onto stack via
-the use of inline assembly. This is done to reduce the amount of work done in
-each function call in order to reduce the overhead of each function call.
+an array from 0 to 24 bytes. All arguments are forced to be spilled onto the stack.
+This is done to simulate registers being spilled due to work being done in
+each function call.
 
 In this, we study three different error handling cases. The first is the null
 case, where no error handling is present. The second case is the case of
@@ -81,6 +81,21 @@ Notably however, in very high call depth cases, and in very high iteration
 counts, exceptions can sometimes outperform result types. This is probably
 because the locality of the exception unwinding mechanism at such high call
 stacks is greater than the locality of result handling.
+
+### Platform Differences
+
+Notably, the windows benchmark is significantly slower than the linux one. That
+isn't due to any inherent deficiency with windows, but rather is a result of
+the optimization inhibition mechanism being different on windows than on linux.
+MSVC does not support the explicit marking of C expressions in assembly, and
+so because of that an alternative inhibition method is necessary. A function
+which takes the address of the expression was used instead, resulting in
+increased overhead from calling the function.
+
+The Windows exception handling mechanism is about twice as slow as the linux
+one, but reaches parity with result handling much faster. I suspect this is
+due to the increased benchmark overhead on windows rather than any real
+improvement on Window's end.
 
 ## Conclusions
 
