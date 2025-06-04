@@ -95,13 +95,13 @@ def generate(depth, template, name, rettype):
 
     cpp.write(template.format(name=name, depth=depth, num = i, args = args, stack = arr, asm = clobber, ret = ret))
 
-noerror = """[[gnu::noinline]]int \n{name}_d{depth}_{num}({args}){{
+noerror = """NOINLINE\nint \n{name}_d{depth}_{num}({args}){{
   {stack};
   asm volatile("" : {asm} :: "memory");
   return {ret};
 }}\n\n"""
 
-result_type = """[[gnu::noinline]]ResultType \n{name}_d{depth}_{num}({args}){{
+result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
   {stack};
   asm volatile("" : {asm} :: "memory");
   auto r = {ret};

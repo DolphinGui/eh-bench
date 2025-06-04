@@ -1,5 +1,14 @@
 #pragma once
 
+
+#ifdef _MSC_VER
+#define NOINLINE [[msvc::noinline]]
+#define FORCEINLINE [[msvc::flatten]]
+#else
+#define NOINLINE [[gnu::noinline]]
+#define FORCEINLINE [[gnu::always_inline]]
+#endif
+
 struct ResultType {
   bool is_some;
   int result;

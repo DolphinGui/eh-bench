@@ -1,7 +1,7 @@
 #include "branches.h"
 #include "functions.h"
 
-[[gnu::noinline]]
+NOINLINE
 int final_noerror(int a, int b, int c, int d, int e, int f, int g, int h) {
   int stack[21];
   asm volatile(""

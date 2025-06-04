@@ -2,7 +2,7 @@
 
 ResultType::~ResultType() = default;
 
-[[gnu::noinline]]
+NOINLINE
 ResultType final_result(int a, int b, int c, int d, int e, int f, int g,
                         int h) {
   ResultType r;
