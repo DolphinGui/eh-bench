@@ -17,24 +17,31 @@ hpp.write("#pragma once\n#include \"functions.h\"\n")
 main = open(sys.argv[3], "w")
 
 main.write("""
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define PICOBENCH_IMPLEMENT_WITH_MAIN
+#include "picobench.hpp"
 
 #include "functions.h"
 #include "branches.h"
-#include <doctest.h>
-#include <nanobench.h>
 
 """)
 
 testcase_templ = """
-TEST_CASE("{name} d{depth} i{iterations}") {{
-  ankerl::nanobench::Bench().run("{name} d{depth} i{iterations}",
-                                 [] {{ for(int i = 0; i < {iterations}; ++i)
-                                 {{ {pre} {basefunction}({args}); {post} }} }});
-}}\n\n
+static void {name}_d{depth}(picobench::state& s) {{
+  global_timer = &s;
+  int i = 0;
+  for (auto _ : s) {{ 
+  {pre}
+  {basefunction}({args}); 
+  {post}
+  s.stop_timer();
+  i += 1;
+  }}
+  global_timer = nullptr;
+}}
+PICOBENCH({name}_d{depth});
 """
 
-def test_format(name, depth, iterations):
+def test_format(name, depth):
   if "exception" in name:
     pre = "try{"
     post = """
@@ -53,12 +60,11 @@ def test_format(name, depth, iterations):
     args = args,
     pre = pre,
     post = post,
-    iterations = iterations,
     depth = depth
     )
 
-def call_main(depth, name, iterations):
-  main.write(test_format(name, depth, iterations))
+def call_main(depth, name):
+  main.write(test_format(name, depth))
 
 def generate(depth, template, name, rettype):
   prev_argnum = 0
@@ -106,8 +112,8 @@ result_type = """[[gnu::noinline]]ResultType \n{name}_d{depth}_{num}({args}){{
   return r;
 }}\n\n"""
 
-depths = [1, 2, 25, 50, 100]
-iterations = [1, 50, 200, 1000]
+depths = [1, 2, 25, 50]
+iterations = [1, 50, 200]
 
 for depth in depths:
   generate(depth, noerror, "noerror", "int")
@@ -120,8 +126,8 @@ for depth in depths:
 for depth in depths:
   generate(depth, noerror, "exception", "int")
 
-for i in iterations:
-  for depth in depths:
-    call_main(depth, "noerror", i)
-    call_main(depth, "result", i)
-    call_main(depth, "exception", i)
+for depth in depths:
+  main.write(f'PICOBENCH_SUITE("Depth {depth}");\n')
+  call_main(depth, "noerror")
+  call_main(depth, "result")
+  call_main(depth, "exception")

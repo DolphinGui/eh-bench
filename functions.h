@@ -3,8 +3,26 @@
 struct ResultType {
   bool is_some;
   int result;
+  // Usually either the error or the result is non-trivial because it contains
+  // a string or a nontrivial result. To emulate that, we add a non-trivial
+  // destructor to force the return value to be spilled onto the stack.
+
+  // To be clear I'm not really sure this is necessarily reflective of how other
+  // languages work. It absolutely is reflective of how C++ works
+  // (std::expected), but looking at toy examples in Godbolt for rust seems to
+  // show that it can pass certain non-trivial objects in registers (Box). I'm
+  // not sure if this is because rust doesn't follow any ABI, or because Box is
+  // just special in rust. I have even less of an idea how Go code generation
+  // even works.
+  ~ResultType();
 };
 
+namespace picobench {
+struct state;
+}
+
+extern picobench::state *global_timer;
+void start_timing();
 // As the name suggests, does literally no error
 // handling.
 int final_noerror(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,

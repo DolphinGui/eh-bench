@@ -2,7 +2,7 @@ project(
     'eh-bench',
     'cpp',
     version: '0.1',
-    default_options: ['warning_level=3', 'cpp_std=c++14'],
+    default_options: ['warning_level=3', 'cpp_std=c++17'],
 )
 
 py = find_program('python3')
@@ -15,11 +15,11 @@ test_data = custom_target(
 
 exe = executable(
     'eh-bench',
-    'nanobench.cpp',
     'no_error.cpp',
     'result.cpp',
     'exception.cpp',
+    'timing.cpp',
     test_data,
 )
 
-test('basic', exe)
+test('benchmark', exe)

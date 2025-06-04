@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "branches.h"
+#include "functions.h"
 
 [[gnu::noinline]]
 int final_noerror(int a, int b, int c, int d, int e, int f, int g, int h) {
@@ -7,5 +7,6 @@ int final_noerror(int a, int b, int c, int d, int e, int f, int g, int h) {
   asm volatile(""
                : "+m"(a), "+m"(b), "+m"(c), "+m"(d), "+m"(e), "+m"(f),
                  "=m"(stack)::"memory");
-  return (a + b + c + d + e + f + g + h);
+  start_timing();
+  return 1;
 }
