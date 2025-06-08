@@ -112,16 +112,13 @@ result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
   return r;
 }}\n\n"""
 
-depths = [1, 2, 25, 50]
-iterations = [1, 50, 200]
+depths = [2, 25, 50, 100, 200]
 
 for depth in depths:
   generate(depth, noerror, "noerror", "int")
 
-
 for depth in depths:
   generate(depth, result_type, "result", "ResultType")
-
 
 for depth in depths:
   generate(depth, noerror, "exception", "int")
