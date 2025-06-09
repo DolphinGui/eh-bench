@@ -2,11 +2,9 @@
 #include "functions.h"
 
 NOINLINE
-int final_noerror(int a, int b, int c, int d, int e, int f, int g, int h) {
+int final_noerror(int a) {
   int stack[21];
-  asm volatile(""
-               : "+m"(a), "+m"(b), "+m"(c), "+m"(d), "+m"(e), "+m"(f),
-                 "=m"(stack)::"memory");
+  asm volatile("" : "=m"(stack)::"memory");
   start_timing();
   return 1;
 }
