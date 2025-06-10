@@ -17,10 +17,12 @@ test_data = custom_target(
     output: ['branches.cpp', 'branches.h', 'main.cpp'],
 )
 
-add_global_arguments(
-    ['-save-temps=obj'],
-    language: ['c', 'cpp'],
-)
+# add_global_arguments(
+#     ['-save-temps=obj'],
+#     language: ['c', 'cpp'],
+# )
+
+ld_script = meson.current_source_dir() / 'script.ld'
 
 exe = executable(
     'eh-bench',
@@ -29,11 +31,7 @@ exe = executable(
     'exception.cpp',
     'timing.cpp',
     test_data,
-    link_args: [
-        '-Wl,--gc-sections',
-        '-Xlinker',
-        '-Map=output.map',
-    ],
+    link_args: ['-Wl,--gc-sections', '-Xlinker', '-Map=output.map', '-T', ld_script],
 )
 
 test('benchmark', exe)
