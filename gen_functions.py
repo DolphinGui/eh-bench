@@ -38,7 +38,7 @@ static void {name}_d{depth}(picobench::state& s) {{
   }}
   global_timer = nullptr;
 }}
-PICOBENCH({name}_d{depth});
+PICOBENCH({name}_d{depth}).samples(50);
 """
 
 def test_format(name, depth):
@@ -96,7 +96,7 @@ noerror = """NOINLINE\nint \n{name}_d{depth}_{num}({args}){{
   return {ret};
 }}\n\n"""
 
-result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
+result_type = """NOINLINE __attribute__((nothrow))\nResultType \n{name}_d{depth}_{num}({args}){{
   {stack};
   asm volatile("" : {clobber} :: "memory");
   auto r = {ret};
