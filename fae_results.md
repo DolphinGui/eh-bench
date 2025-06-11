@@ -28,3 +28,29 @@ whereas DWARF uses 4 byte pointers. This means that FAE exception space should t
 exceptions on 32 bit platforms, where space may bit a bit more lacking. FAE lsda sections however are 
 significantly larger than their DWARF counterparts, being 15k as opposed to 9k. This is probably due to the
 use of 16 bit integers as opposed to LEB128 integers, which was done due to the sloth of decoding LEB128.
+
+## Further optimization
+
+In order to further optimize FAE exceptions, a linker script was used to remove unnecessary indexes and reorder
+the most commonly thrown functions to be searched first. This represents a hypothetical optimzation done by the
+linker which would reorder and garbage collect FAE exceptions. This brings the speed of FAE exceptions up to about
+3x slower than a normal function call. This implies that the bulk of the improvements is from FAE speeding up unwinding
+rather than the search phase, which is to be expected given DWARF exceptions use a B-Table internally, which is about
+optimal wheras FAE uses linear search, which is very much less than optimal.
+
+Further hypothetical optimizations may include combining several unwinds together when the unwound callstack is known,
+(exception information inlining, aka trampolining), the use of a static B-Table instead of linear search, cache warming,
+index garbage collection, merging, amongst others. I will discuss exception inlining and merging due to their
+relative novelity and lack of prior art.
+
+Exception inlining, (something Khalil calls trampolining), is when the unwind information of multiple
+functions known to always call eachother is concatenated to create one. In the case of a non-linear call-graph,
+this may result in increased unwind information size due to duplication of caller unwind information.
+Such an optimization in the case of FAE would result in restoring the saved registers from the various callframes
+of the functions, then decrementing the stack by the sum of the stack usage of the callframes. This would increase
+unwind speed due to a reduced need to search indicies.
+
+Merging of exception information is an optimization where multiple functions with the same call frame are grouped together
+such that their indicies and unwind information can be merged. This could greatly reduce space usage at the minor cost
+of questionably penalizing instruction locality. This would almost certainly have to be done via a linker plugin or
+in the linker itself. This increases speed by reducing index search time and increases space efficiency.
