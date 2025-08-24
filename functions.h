@@ -69,5 +69,4 @@ struct ExceptionC : ExceptionBase {
 // in std::exception, we define our own
 // exception type which contains barely any
 
-int final_exception(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
-                    int = 0, int = 0);
+int final_exception(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0);
