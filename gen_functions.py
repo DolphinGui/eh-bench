@@ -8,7 +8,7 @@ arguments = ["int a = 0", "int b = 0","int c = 0","int d = 0","int e = 0","int f
 
 cpp = open(sys.argv[1], "w")
 
-cpp.write("#include \"functions.h\"\n")
+cpp.write("#include \"branches.h\"\n")
 
 hpp = open(sys.argv[2], "w")
 
@@ -66,22 +66,16 @@ def test_format(name, depth):
 def call_main(depth, name):
   main.write(test_format(name, depth))
 
+functions = []
+
 def generate(depth, template, name, rettype):
   prev_argnum = 0
-  hpp.write("{} {}_d{}_{}({});\n".format(rettype, name, depth, 0, ", ".join(arguments[0:6])))
   for i in reversed(range(depth)):
     if i == 0:
       argnum = 6
     else:
       argnum = random.randint(1, 6)
-    arrsize = random.randint(0, 24)
-    clobber = ["\"+m\"({})".format(r) for r in argument_names[0:argnum]]
-    if arrsize > 0:
-      arr = "char stack[{}]".format(arrsize)
-      clobber.append("\"+m\"(stack)")
-    else:
-      arr = ""
-    clobber = ", ".join(clobber) 
+    hpp.write("extern \"C\" {} {}_d{}_{}({});\n".format(rettype, name, depth, i, ", ".join(arguments[0:argnum])))
 
     if i != depth - 1:
       ret = "{}_d{}_{}({})".format(name, depth, i + 1, ", ".join(argument_names[0:min(argnum, prev_argnum)]))
@@ -91,24 +85,18 @@ def generate(depth, template, name, rettype):
    
     prev_argnum = argnum
 
-    args = ", ".join(arguments[0:argnum])
-
-    cpp.write(template.format(name=name, depth=depth, num = i, args = args, stack = arr, asm = clobber, ret = ret))
+    args = ", ".join(["int " + x for x in argument_names[0:argnum]])
+    functions.append(template.format(name=name, depth=depth, num = i, args = args, ret = ret))
 
 noerror = """NOINLINE\nint \n{name}_d{depth}_{num}({args}){{
-  {stack};
-  asm volatile("" : {asm} :: "memory");
   return {ret};
 }}\n\n"""
 
 result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
-  {stack};
-  asm volatile("" : {asm} :: "memory");
   auto r = {ret};
   if(!r.is_some){{
     return r;
   }}
-  asm volatile("" : "+m"(r) :: "memory");
   return r;
 }}\n\n"""
 
@@ -122,6 +110,11 @@ for depth in depths:
 
 for depth in depths:
   generate(depth, noerror, "exception", "int")
+
+random.shuffle(functions)
+
+for f in functions:
+  cpp.write(f)
 
 for depth in depths:
   main.write(f'PICOBENCH_SUITE("Depth {depth}");\n')

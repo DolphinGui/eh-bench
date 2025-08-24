@@ -20,6 +20,8 @@ exe = executable(
     'exception.cpp',
     'timing.cpp',
     test_data,
+    cpp_args: ['-ffunction-sections', '-fdata-sections'],
+    link_args: ['-Xlinker', '-Map=output.map'],
 )
 
 test('benchmark', exe)
