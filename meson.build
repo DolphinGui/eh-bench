@@ -13,15 +13,18 @@ test_data = custom_target(
     output: ['branches.cpp', 'branches.h', 'main.cpp'],
 )
 
+gbench = dependency('benchmark-main')
+
 exe = executable(
     'eh-bench',
     'no_error.cpp',
     'result.cpp',
     'exception.cpp',
-    'timing.cpp',
+    'trivial.cpp',
     test_data,
     cpp_args: ['-ffunction-sections', '-fdata-sections'],
     link_args: ['-Xlinker', '-Map=output.map'],
+    dependencies: [gbench]
 )
 
 test('benchmark', exe)

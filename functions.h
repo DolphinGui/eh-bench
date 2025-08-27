@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef _MSC_VER
 #define NOINLINE [[msvc::noinline]]
 #define FORCEINLINE [[msvc::flatten]]
@@ -26,22 +25,21 @@ struct ResultType {
   ~ResultType();
 };
 
-namespace picobench {
-struct state;
-}
+// similar to ResultType, but trivially destructable
+struct TrivialResult {
+  bool is_some;
+  int result;
+};
 
-extern picobench::state *global_timer;
-void start_timing();
 // As the name suggests, does literally no error
 // handling.
-int final_noerror(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
-                  int = 0);
+int final_noerror(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0);
 
 // result_error represents ML style error handling, where errors
 // are just types. This requires checking the return value
 // every single time.
-ResultType final_result(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0,
-                        int = 0, int = 0);
+ResultType final_result(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0);
+TrivialResult final_trivial(int = 0, int = 0, int = 0, int = 0, int = 0, int = 0);
 
 struct ExceptionBase {};
 

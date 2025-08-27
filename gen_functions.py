@@ -17,8 +17,7 @@ hpp.write("#pragma once\n#include \"functions.h\"\n")
 main = open(sys.argv[3], "w")
 
 main.write("""
-#define PICOBENCH_IMPLEMENT_WITH_MAIN
-#include "picobench.hpp"
+#include "benchmark/benchmark.h"
 
 #include "functions.h"
 #include "branches.h"
@@ -26,19 +25,16 @@ main.write("""
 """)
 
 testcase_templ = """
-static void {name}_d{depth}(picobench::state& s) {{
-  global_timer = &s;
+static void {name}_d{depth}(benchmark::State& s) {{
   int i = 0;
   for (auto _ : s) {{ 
   {pre}
   {basefunction}({args}); 
   {post}
-  s.stop_timer();
   i += 1;
   }}
-  global_timer = nullptr;
 }}
-PICOBENCH({name}_d{depth});
+BENCHMARK({name}_d{depth});
 """
 
 def test_format(name, depth):
@@ -100,6 +96,14 @@ result_type = """NOINLINE\nResultType \n{name}_d{depth}_{num}({args}){{
   return r;
 }}\n\n"""
 
+trivial = """NOINLINE\nTrivialResult \n{name}_d{depth}_{num}({args}){{
+  auto r = {ret};
+  if(!r.is_some){{
+    return r;
+  }}
+  return r;
+}}\n\n"""
+
 depths = [2, 25, 50, 100, 200]
 
 for depth in depths:
@@ -107,6 +111,9 @@ for depth in depths:
 
 for depth in depths:
   generate(depth, result_type, "result", "ResultType")
+
+for depth in depths:
+  generate(depth, trivial, "trivial", "TrivialResult")
 
 for depth in depths:
   generate(depth, noerror, "exception", "int")
@@ -117,7 +124,7 @@ for f in functions:
   cpp.write(f)
 
 for depth in depths:
-  main.write(f'PICOBENCH_SUITE("Depth {depth}");\n')
   call_main(depth, "noerror")
   call_main(depth, "result")
+  call_main(depth, "trivial")
   call_main(depth, "exception")
